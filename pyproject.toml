@@ -1,0 +1,25 @@
+[build-system]
+requires = ["setuptools>=64.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "gw-line-cleaner"
+description = "Remove line artifacts from gravitational wave data"
+authors = [
+    { name = "Ye Zhou", email = "u7993710@anu.edu.au" },
+    { name = "Karl Wette", email = "karl.wette@anu.edu.au" },
+]
+requires-python = ">=3.10"
+license = "MIT"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Operating System :: OS Independent",
+]
+dynamic = ["version"]
+
+[project.urls]
+Homepage = "https://github.com/gw-line-cleaner/gw-line-cleaner"
+Issues = "https://github.com/gw-line-cleaner/gw-line-cleaner/issues"
+
+[tool.setuptools.dynamic]
+version = {attr = "gw_line_cleaner.__version__"}
