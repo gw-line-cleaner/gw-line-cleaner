@@ -25,6 +25,8 @@ LOGGER = logging.getLogger(__name__)
 
 def _classify_width(width: float) -> str:
     """Match coherent_analyzer's width classification for consistency."""
+    if width < coherent_analyzer.VERY_NARROW_LINE_THRESHOLD:
+        return "very_narrow"
     if width < coherent_analyzer.NARROW_LINE_THRESHOLD:
         return "narrow"
     if width > coherent_analyzer.WIDE_LINE_THRESHOLD:
