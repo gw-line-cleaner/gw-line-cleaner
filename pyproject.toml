@@ -13,9 +13,29 @@ requires-python = ">=3.10"
 license = "MIT"
 classifiers = [
     "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
     "Operating System :: OS Independent",
+    "Intended Audience :: Science/Research",
+    "Topic :: Scientific/Engineering :: Astronomy",
+    "Topic :: Scientific/Engineering :: Physics",
 ]
 dynamic = ["version"]
+
+dependencies = [
+    "numpy>=1.20",
+    "scipy>=1.7",
+    "matplotlib>=3.4",
+    "astropy>=5.0",
+    "numba>=0.55",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.0",
+    "pytest-cov>=4.0",
+]
 
 [project.urls]
 Homepage = "https://github.com/gw-line-cleaner/gw-line-cleaner"
@@ -23,3 +43,6 @@ Issues = "https://github.com/gw-line-cleaner/gw-line-cleaner/issues"
 
 [tool.setuptools.dynamic]
 version = {attr = "gw_line_cleaner.__version__"}
+
+[tool.setuptools.packages.find]
+where = ["src"]
