@@ -5,6 +5,7 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "gw-line-cleaner"
 description = "Remove line artifacts from gravitational wave data"
+readme = "README.md"
 authors = [
     { name = "Ye Zhou", email = "u7993710@anu.edu.au" },
     { name = "Karl Wette", email = "karl.wette@anu.edu.au" },
