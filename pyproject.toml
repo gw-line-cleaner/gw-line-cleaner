@@ -5,12 +5,19 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "gw-line-cleaner"
 description = "Remove line artifacts from gravitational wave data"
-readme = "README.md"
 authors = [
     { name = "Ye Zhou", email = "u7993710@anu.edu.au" },
     { name = "Karl Wette", email = "karl.wette@anu.edu.au" },
 ]
 requires-python = ">=3.10"
+dependencies = [
+    "numpy>=1.20",
+    "scipy>=1.7",
+    "matplotlib>=3.4",
+    "astropy>=5.0",
+    "numba>=0.55",
+]
+readme = "README.md"
 license = "MIT"
 classifiers = [
     "Programming Language :: Python :: 3",
@@ -23,20 +30,7 @@ classifiers = [
     "Topic :: Scientific/Engineering :: Physics",
 ]
 dynamic = ["version"]
-
-dependencies = [
-    "numpy>=1.20",
-    "scipy>=1.7",
-    "matplotlib>=3.4",
-    "astropy>=5.0",
-    "numba>=0.55",
-]
-
-[project.optional-dependencies]
-dev = [
-    "pytest>=7.0",
-    "pytest-cov>=4.0",
-]
+license-files = ["LICENSES/MIT.txt", "LICENSES/CC0-1.0.txt"]
 
 [project.urls]
 Homepage = "https://github.com/gw-line-cleaner/gw-line-cleaner"
@@ -45,5 +39,75 @@ Issues = "https://github.com/gw-line-cleaner/gw-line-cleaner/issues"
 [tool.setuptools.dynamic]
 version = {attr = "gw_line_cleaner.__version__"}
 
-[tool.setuptools.packages.find]
-where = ["src"]
+[tool.ruff]
+fix = true
+show-fixes = true
+
+[tool.ruff.lint]
+select = [
+    "D1", "D2", "D4",
+    "E4", "E7", "E9",
+    "EM",
+    "F",
+    "I",
+]
+ignore = [
+    "D105", "D202",
+]
+
+[tool.ruff.lint.pydocstyle]
+convention = "google"
+
+[tool.pydoclint]
+style = "google"
+allow-init-docstring = true
+skip-checking-raises = true
+
+[tool.pytest.ini_options]
+minversion = "6.0"
+addopts = "--cov=py_api_dumper --cov-report=term-missing"
+testpaths = ["test"]
+
+[tool.ppqs.defaults]
+print-header = true
+
+[tool.ppqs.scripts.init]
+description = "Initialise project"
+script = """
+python -m pip install -r requirements-dev.txt
+pre-commit install
+python -m pip install -e .
+"""
+
+[tool.ppqs.scripts.lint]
+description = "Perform linting checks"
+script = """
+pre-commit run -a
+"""
+
+[tool.ppqs.scripts.build]
+description = "Build project"
+script = """
+ppqs clean
+python -m build
+"""
+
+[tool.ppqs.scripts.test]
+description = "Run tests"
+script = """
+python -m pytest ...
+"""
+
+[tool.ppqs.scripts.upload]
+description = "Upload package"
+script = [
+    ["ppqs", "test"],
+    ["ppqs", "build"],
+    ["twine", "upload", ["dist", "*"]],
+    ["git", "push", "origin"],
+    ["git", "push", "origin", "--tags"],
+]
+
+[tool.ppqs.scripts.clean]
+description = "Clean up build files"
+script = "git clean -Xdf"

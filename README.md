@@ -60,7 +60,7 @@ detector_files = {
 
 # Analyze coherent lines across detectors
 coherent_groups, detector_data = gwlc.analyze_coherent_lines(
-    detector_files, 
+    detector_files,
     min_detectors=2  # Lines must appear in at least 2 detectors
 )
 
