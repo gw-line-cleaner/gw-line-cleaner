@@ -12,6 +12,9 @@ authors = [
 requires-python = ">=3.10"
 dependencies = [
     "astropy>=5.0",
+    "coloredlogs>=15.0",
+    "h5py>=3.16",
+    "lalsuite[lalpulsar]>=7.26",
     "matplotlib>=3.4",
     "numba>=0.55",
     "numpy>=1.20",
@@ -38,6 +41,9 @@ license-files = [
 [project.urls]
 Homepage = "https://github.com/gw-line-cleaner/gw-line-cleaner"
 Issues = "https://github.com/gw-line-cleaner/gw-line-cleaner/issues"
+
+[project.scripts]
+gw-line-cleaner = "gw_line_cleaner.cli:cli"
 
 [tool.setuptools_scm]
 # required for version inference
