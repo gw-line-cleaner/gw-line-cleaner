@@ -4,6 +4,7 @@
 
 """Fit baseline to spectrum using iterative polynomial fitting."""
 
+import logging
 import os
 import time
 import warnings
@@ -19,6 +20,8 @@ from scipy.ndimage import median_filter
 from scipy.signal import find_peaks
 
 FitTuple = Tuple[Optional[np.ndarray], Optional[np.ndarray], Optional["Result"]]
+
+logger = logging.getLogger(__name__)
 
 # =============================================================================
 # CONFIGURATION PARAMETERS
@@ -138,14 +141,14 @@ class Result:
     def info(self, detector_name: Optional[str] = None) -> None:
         """Print detailed information about the fitting results."""
         prefix = f"{detector_name} " if detector_name else ""
-        print(f"{prefix}Baseline Fitting Results")
-        print("=" * 40)
-        print(f"Polynomial degree: {POLYNOMIAL_DEGREE}")
-        print(f"Iterations: {self.iterations}")
-        print(f"Data usage: {self.data_used:.1f}% of points")
-        print(f"RMS quality: {self.rms:.4f}")
-        print(f"Processing time: {self.time:.2f} seconds")
-        print(f"Input data type: {self.data_type.upper()}")
+        logger.info(f"{prefix}Baseline Fitting Results")
+        logger.info("=" * 40)
+        logger.info(f"Polynomial degree: {POLYNOMIAL_DEGREE}")
+        logger.info(f"Iterations: {self.iterations}")
+        logger.info(f"Data usage: {self.data_used:.1f}% of points")
+        logger.info(f"RMS quality: {self.rms:.4f}")
+        logger.info(f"Processing time: {self.time:.2f} seconds")
+        logger.info(f"Input data type: {self.data_type.upper()}")
 
     def find_noise_lines(
         self, frequency: np.ndarray, spectrum: np.ndarray, threshold: float = 1.5

@@ -9,6 +9,7 @@ Generalized to support arbitrary number of detectors.
 
 import contextlib
 import itertools
+import logging
 from dataclasses import dataclass, field
 from io import StringIO
 from typing import Dict, List, Optional, Set, Tuple
@@ -18,6 +19,8 @@ import numpy as np
 
 from . import baseline_fit, simple_line_detector
 from .simple_line_detector import Line
+
+logger = logging.getLogger(__name__)
 
 # =============================================================================
 # ADAPTIVE MATCHING PARAMETERS
@@ -666,25 +669,29 @@ def print_summary(
     coherent_groups: List[CoherentLineGroup], detector_data: Dict[str, DetectorData]
 ) -> None:
     """Print summary of coherent line analysis."""
-    print("\n" + "=" * 80)
-    print("MULTI-DETECTOR COHERENT SPECTRAL LINES ANALYSIS")
-    print("=" * 80)
-    print(f"Detectors analyzed: {', '.join(sorted(detector_data.keys()))}")
-    print(f"Total coherent line groups: {len(coherent_groups)}")
+    logger.info("\n" + "=" * 80)
+    logger.info("MULTI-DETECTOR COHERENT SPECTRAL LINES ANALYSIS")
+    logger.info("=" * 80)
+    logger.info(f"Detectors analyzed: {', '.join(sorted(detector_data.keys()))}")
+    logger.info(f"Total coherent line groups: {len(coherent_groups)}")
 
     if not coherent_groups:
-        print("No coherent lines detected")
+        logger.info("No coherent lines detected")
         return
 
-    print("\n" + "-" * 80)
-    print(f"{'No.':<4} {'Freq(Hz)':<12} {'Detectors':<20} {'Freq Spread(Hz)':<15}")
-    print("-" * 80)
+    logger.info("\n" + "-" * 80)
+    logger.info(
+        f"{'No.':<4} {'Freq(Hz)':<12} {'Detectors':<20} {'Freq Spread(Hz)':<15}"
+    )
+    logger.info("-" * 80)
 
     for i, group in enumerate(coherent_groups, 1):
         det_list = ",".join(sorted(group.detectors))
         freqs = [line.frequency for line in group.detector_lines.values()]
         freq_spread = max(freqs) - min(freqs) if len(freqs) > 1 else 0
-        print(f"{i:<4} {group.frequency:<12.2f} {det_list:<20} {freq_spread:<15.4f}")
+        logger.info(
+            f"{i:<4} {group.frequency:<12.2f} {det_list:<20} {freq_spread:<15.4f}"
+        )
 
 
 def print_all_lines_detailed(
@@ -697,27 +704,27 @@ def print_all_lines_detailed(
         for det_name, line in group.detector_lines.items():
             coherent_freqs[det_name].add(line.frequency)
 
-    print("\n" + "=" * 100)
-    print("DETAILED SPECTRAL LINE ANALYSIS - ALL DETECTED LINES")
-    print("=" * 100)
+    logger.info("\n" + "=" * 100)
+    logger.info("DETAILED SPECTRAL LINE ANALYSIS - ALL DETECTED LINES")
+    logger.info("=" * 100)
 
     for det_name in sorted(detector_data.keys()):
         det_data = detector_data[det_name]
         lines = det_data.lines
         det_coherent = coherent_freqs[det_name]
 
-        print(f"\n{det_name} DETECTOR LINES (Total: {len(lines)})")
-        print("-" * 100)
-        print(
+        logger.info(f"\n{det_name} DETECTOR LINES (Total: {len(lines)})")
+        logger.info("-" * 100)
+        logger.info(
             f"{'No.':<4} {'Frequency':<12} {'Amplitude':<10} {'Width':<10} {'Type':<12} {'Coherent':<10}"
         )
-        print("-" * 100)
+        logger.info("-" * 100)
 
         for i, line in enumerate(lines, 1):
             line_type = _classify_line_width(line)
             is_coherent = line.frequency in det_coherent
             coherent_flag = "YES" if is_coherent else "NO"
-            print(
+            logger.info(
                 f"{i:<4} {line.frequency:<12.2f} {line.amplitude:<10.2f} {line.width:<10.4f} {line_type.upper():<12} {coherent_flag:<10}"
             )
 
@@ -726,9 +733,9 @@ def print_detector_statistics(
     detector_data: Dict[str, DetectorData], coherent_groups: List[CoherentLineGroup]
 ) -> None:
     """Print per-detector statistics."""
-    print("\n" + "=" * 80)
-    print("PER-DETECTOR STATISTICS")
-    print("=" * 80)
+    logger.info("\n" + "=" * 80)
+    logger.info("PER-DETECTOR STATISTICS")
+    logger.info("=" * 80)
 
     for det_name in sorted(detector_data.keys()):
         det = detector_data[det_name]
@@ -746,13 +753,13 @@ def print_detector_statistics(
             1 for group in coherent_groups if det_name in group.detector_lines
         )
 
-        print(f"\n{det_name}: {total} total lines")
+        logger.info(f"\n{det_name}: {total} total lines")
         if total > 0:
-            print(f"  Very Narrow: {vn} ({100*vn/total:.1f}%)")
-            print(f"  Narrow: {n} ({100*n/total:.1f}%)")
-            print(f"  Medium: {m} ({100*m/total:.1f}%)")
-            print(f"  Wide: {w} ({100*w/total:.1f}%)")
-        print(f"  In coherent groups: {coherent_count}")
+            logger.info(f"  Very Narrow: {vn} ({100*vn/total:.1f}%)")
+            logger.info(f"  Narrow: {n} ({100*n/total:.1f}%)")
+            logger.info(f"  Medium: {m} ({100*m/total:.1f}%)")
+            logger.info(f"  Wide: {w} ({100*w/total:.1f}%)")
+        logger.info(f"  In coherent groups: {coherent_count}")
 
 
 def analyze_and_plot(
