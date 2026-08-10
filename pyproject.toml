@@ -1,5 +1,5 @@
 [build-system]
-requires = ["setuptools>=64.0"]
+requires = ["setuptools>=80", "setuptools-scm>=8"]
 build-backend = "setuptools.build_meta"
 
 [project]
@@ -39,8 +39,8 @@ license-files = [
 Homepage = "https://github.com/gw-line-cleaner/gw-line-cleaner"
 Issues = "https://github.com/gw-line-cleaner/gw-line-cleaner/issues"
 
-[tool.setuptools.dynamic]
-version = {attr = "gw_line_cleaner.__version__"}
+[tool.setuptools_scm]
+# required for version inference
 
 [tool.ruff]
 fix = true
