@@ -10,7 +10,12 @@ from gravitational wave detector data. Supports analysis across
 arbitrary numbers of detectors (LIGO, Virgo, KAGRA, etc.).
 """
 
-__version__ = "0.1.0"
+from importlib.metadata import PackageNotFoundError, version
+
+try:
+    __version__ = version("gw_line_cleaner")
+except PackageNotFoundError:  # pragma: no cover
+    __version__ = "NOT-INSTALLED"
 
 # Import main classes and functions for public API
 from .baseline_fit import (
