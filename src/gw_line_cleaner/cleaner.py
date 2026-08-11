@@ -14,7 +14,7 @@ import os
 import tempfile
 from io import StringIO
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Set
+from typing import Any, Dict, List, Optional, Set, Tuple
 
 import numpy as np
 
@@ -399,7 +399,7 @@ def get_cleaning_mask(
 
 def apply_cleaning(
     freq: np.ndarray, detector_psds: Dict[str, np.ndarray], min_detectors: int = 2
-) -> Dict[str, np.ndarray]:
+) -> Tuple[Dict[str, np.ndarray], Dict[str, np.ndarray]]:
     """Apply line cleaning and return cleaned PSD arrays.
 
     Args:
@@ -408,7 +408,8 @@ def apply_cleaning(
         min_detectors (int): Minimum detectors for coherence
 
     Returns:
-        Dict[str, np.ndarray]: Dict mapping detector names to cleaned PSD arrays
+        Tuple[Dict[str, np.ndarray], Dict[str, np.ndarray]]:
+            Dict mapping detector names to cleaned PSD arrays and masks
     """
     detector_clean = {det: np.zeros_like(psd) for det, psd in detector_psds.items()}
 
@@ -423,10 +424,12 @@ def apply_cleaning(
 
     # Apply cleaning: where clean != 0, use clean value; otherwise keep original
     cleaned_psds = {}
+    masks = {}
     for det, psd in detector_psds.items():
         cleaned = psd.copy()
         mask = detector_clean[det] != 0.0
+        masks[det] = mask
         cleaned[mask] = detector_clean[det][mask]
         cleaned_psds[det] = cleaned
 
-    return cleaned_psds
+    return cleaned_psds, masks
