@@ -23,6 +23,9 @@ FitTuple = Tuple[Optional[np.ndarray], Optional[np.ndarray], Optional["Result"]]
 
 logger = logging.getLogger(__name__)
 
+# Silence Numba log messages
+logging.getLogger("numba").setLevel(logging.WARNING)
+
 # =============================================================================
 # CONFIGURATION PARAMETERS
 # =============================================================================
