@@ -7,9 +7,7 @@
 Generalized to support arbitrary number of detectors.
 """
 
-import csv
 import logging
-import os
 import tempfile
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Set, Tuple
@@ -36,11 +34,14 @@ def _classify_width(width: float) -> str:
 def _write_csv(path: Path, header: list, rows_iter):
     """Utility to write CSV with header."""
     path.parent.mkdir(parents=True, exist_ok=True)
-    with path.open("w", newline="") as f:
-        writer = csv.writer(f)
-        writer.writerow(header)
-        for row in rows_iter:
-            writer.writerow(row)
+    np.savetxt(
+        path,
+        np.array(list(rows_iter)),
+        header=",".join(header),
+        delimiter=",",
+        fmt="%.8e",
+    )
+    logger.info("Wrote data to CSV file %s", path)
 
 
 def clean_lines_from_PSD(
@@ -120,11 +121,9 @@ def clean_lines_from_PSD(
             # Save each detector's ASD data to temporary files
             temp_files = {}
             for det_name in detector_names:
-                temp_file = os.path.join(temp_dir, f"{det_name}_temp.txt")
-                with open(temp_file, "w") as f:
-                    for i in range(len(freq)):
-                        f.write(f"{freq[i]:.8e} {detector_asds[det_name][i]:.8e}\n")
-                temp_files[det_name] = temp_file
+                temp_file = Path(temp_dir) / f"{det_name}_temp.csv"
+                _write_csv(temp_file, [], zip(freq, detector_asds[det_name]))
+                temp_files[det_name] = str(temp_file)
 
             logger.info("Running coherent analysis using coherent_analyzer module")
 
