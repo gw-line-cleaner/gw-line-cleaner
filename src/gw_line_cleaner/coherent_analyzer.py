@@ -7,11 +7,9 @@
 Generalized to support arbitrary number of detectors.
 """
 
-import contextlib
 import itertools
 import logging
 from dataclasses import dataclass, field
-from io import StringIO
 from typing import Dict, List, Optional, Set, Tuple
 
 import matplotlib.pyplot as plt
@@ -140,12 +138,13 @@ def analyze_coherent_lines(
     detector_data: Dict[str, DetectorData] = {}
 
     for det_name, file_path in detector_files.items():
-        with contextlib.redirect_stdout(StringIO()):
-            freq, spectrum, result = baseline_fit.load_and_fit(file_path)
-            assert result is not None
-            lines = simple_line_detector.detect_lines(
-                freq, spectrum, result.baseline, detector_name=det_name
-            )
+        logger.info("Fitting baseline PSD of detector %s", det_name)
+        freq, spectrum, result = baseline_fit.load_and_fit(file_path)
+        assert result is not None
+        logger.info("Detecting lines in %s spectrum", det_name)
+        lines = simple_line_detector.detect_lines(
+            freq, spectrum, result.baseline, detector_name=det_name
+        )
 
         detector_data[det_name] = DetectorData(
             name=det_name,
@@ -156,9 +155,11 @@ def analyze_coherent_lines(
         )
 
     # Find pairwise coherent lines
+    logger.info("Finding pairwise coherent lines")
     all_pairs = _find_all_pairwise_coherent(detector_data)
 
     # Group into multi-detector coherent lines
+    logger.info("Grouping multi-detector coherent lines")
     coherent_groups = _group_coherent_lines(all_pairs, detector_data, min_detectors)
 
     return coherent_groups, detector_data

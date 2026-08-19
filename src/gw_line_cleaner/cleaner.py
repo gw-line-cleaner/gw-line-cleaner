@@ -7,12 +7,10 @@
 Generalized to support arbitrary number of detectors.
 """
 
-import contextlib
 import csv
 import logging
 import os
 import tempfile
-from io import StringIO
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Set, Tuple
 
@@ -21,7 +19,7 @@ import numpy as np
 from . import coherent_analyzer
 
 # Configure logging
-LOGGER = logging.getLogger(__name__)
+logger = logging.getLogger(__name__)
 
 
 def _classify_width(width: float) -> str:
@@ -104,7 +102,7 @@ def clean_lines_from_PSD(
             msg = f"Clean array for {det_name} has wrong length"
             raise ValueError(msg)
 
-    LOGGER.debug(
+    logger.debug(
         "clean_lines_from_PSD: freq shape=%s, detectors=%s", freq.shape, detector_names
     )
 
@@ -116,9 +114,9 @@ def clean_lines_from_PSD(
         # Convert PSD to ASD for analysis modules (ASD = sqrt(PSD))
         detector_asds = {det: np.sqrt(psd) for det, psd in detector_psds.items()}
 
-        LOGGER.debug("Converting PSD to ASD and starting coherent analysis")
+        logger.info("Converting PSD to ASD and starting coherent analysis")
 
-        with tempfile.TemporaryDirectory() as temp_dir:
+        with tempfile.TemporaryDirectory(dir=Path.cwd()) as temp_dir:
             # Save each detector's ASD data to temporary files
             temp_files = {}
             for det_name in detector_names:
@@ -128,15 +126,12 @@ def clean_lines_from_PSD(
                         f.write(f"{freq[i]:.8e} {detector_asds[det_name][i]:.8e}\n")
                 temp_files[det_name] = temp_file
 
-            LOGGER.debug("Running coherent analysis using coherent_analyzer module")
+            logger.info("Running coherent analysis using coherent_analyzer module")
 
             # Use generalized coherent_analyzer
-            with contextlib.redirect_stdout(StringIO()):
-                coherent_groups, detector_data = (
-                    coherent_analyzer.analyze_coherent_lines(
-                        temp_files, min_detectors=min_detectors
-                    )
-                )
+            coherent_groups, detector_data = coherent_analyzer.analyze_coherent_lines(
+                temp_files, min_detectors=min_detectors
+            )
 
         # Extract per-detector data
         detector_lines: Dict[str, list] = {}
@@ -151,10 +146,10 @@ def clean_lines_from_PSD(
             detector_freqs[det_name] = det_data.freq
             detector_spectra[det_name] = det_data.spectrum
 
-        LOGGER.debug("Coherent analysis results:")
+        logger.info("Coherent analysis results:")
         for det_name in detector_names:
-            LOGGER.debug(f"  {det_name} total lines: {len(detector_lines[det_name])}")
-        LOGGER.debug(
+            logger.info(f"  {det_name} total lines: {len(detector_lines[det_name])}")
+        logger.info(
             f"  Coherent groups (>={min_detectors} detectors): {len(coherent_groups)}"
         )
 
@@ -230,7 +225,7 @@ def clean_lines_from_PSD(
         for det_name in detector_names:
             cleaning_points = int(np.sum(detector_clean[det_name] != 0.0))
             total_points = len(freq)
-            LOGGER.debug(
+            logger.debug(
                 f"{det_name}: {cleaning_points}/{total_points} points marked for cleaning "
                 f"({100*cleaning_points/total_points:.2f}%)"
             )
@@ -243,8 +238,8 @@ def clean_lines_from_PSD(
         }
 
     except Exception as e:
-        LOGGER.error(f"Error in clean_lines_from_PSD: {str(e)}")
-        LOGGER.error(
+        logger.error(f"Error in clean_lines_from_PSD: {str(e)}")
+        logger.error(
             "Setting cleaning arrays to unity (no cleaning applied downstream)"
         )
         for det_name in detector_names:
