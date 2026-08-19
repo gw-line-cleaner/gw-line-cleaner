@@ -204,19 +204,9 @@ def analyze_coherent_lines_legacy(
             h1_line = group.detector_lines["H1"]
             l1_line = group.detector_lines["L1"]
 
-            # Calculate amplitude ratio
-            h1_data = detector_data["H1"]
-            l1_data = detector_data["L1"]
-            h1_idx = np.argmin(np.abs(h1_data.freq - h1_line.frequency))
-            l1_idx = np.argmin(np.abs(l1_data.freq - l1_line.frequency))
-            h1_baseline_val = (
-                h1_data.baseline[h1_idx] if h1_data.baseline[h1_idx] > 0 else 1e-10
-            )
-            l1_baseline_val = (
-                l1_data.baseline[l1_idx] if l1_data.baseline[l1_idx] > 0 else 1e-10
-            )
-            h1_enhancement = h1_line.amplitude / h1_baseline_val
-            l1_enhancement = l1_line.amplitude / l1_baseline_val
+            # Line.amplitude is already the dimensionless peak-to-baseline ASD ratio.
+            h1_enhancement = h1_line.amplitude
+            l1_enhancement = l1_line.amplitude
             amp_ratio = abs(h1_enhancement - l1_enhancement) / max(
                 h1_enhancement, l1_enhancement
             )
@@ -296,11 +286,8 @@ def _find_coherent_lines_between_detectors(
     used_det2_indices: Set[int] = set()
 
     for det1_line in det1_lines:
-        det1_idx = np.argmin(np.abs(det1_freq - det1_line.frequency))
-        det1_baseline_val = (
-            det1_baseline[det1_idx] if det1_baseline[det1_idx] > 0 else 1e-10
-        )
-        det1_enhancement = det1_line.amplitude / det1_baseline_val
+        # Line.amplitude is already the dimensionless peak-to-baseline ASD ratio.
+        det1_enhancement = det1_line.amplitude
 
         candidates = []
 
@@ -308,11 +295,7 @@ def _find_coherent_lines_between_detectors(
             if i in used_det2_indices:
                 continue
 
-            det2_idx = np.argmin(np.abs(det2_freq - det2_line.frequency))
-            det2_baseline_val = (
-                det2_baseline[det2_idx] if det2_baseline[det2_idx] > 0 else 1e-10
-            )
-            det2_enhancement = det2_line.amplitude / det2_baseline_val
+            det2_enhancement = det2_line.amplitude
 
             params = _get_adaptive_parameters(det1_line, det2_line)
 
