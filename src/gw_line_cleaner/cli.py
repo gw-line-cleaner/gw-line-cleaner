@@ -76,7 +76,7 @@ def parse_command_line(argv):
         type=str.upper,
         choices=["DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"],
         default="INFO",
-        help="Set the logging level (default: %(default)s)",
+        help="Set the logging level (default: %(default)s).",
     )
     parser.add_argument(
         "-t",
@@ -175,14 +175,14 @@ def parse_command_line(argv):
         "--earth-ephemeris",
         type=str,
         default="earth00-40-DE405.dat.gz",
-        help="Earth ephemeris file to use",
+        help="Earth ephemeris file to use.",
     )
     parser.add_argument(
         "-s",
         "--sun-ephemeris",
         type=str,
         default="sun00-40-DE405.dat.gz",
-        help="Sun ephemeris file to use",
+        help="Sun ephemeris file to use.",
     )
 
     return parser.parse_args(argv)
