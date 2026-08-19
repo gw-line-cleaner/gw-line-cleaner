@@ -303,6 +303,16 @@ def write_out_stats_to_h5(h5_group, d):
                 h5_group.create_dataset(k, data=v)
 
 
+def add_SFT_desc_suffix(desc):
+    """Add suffix to SFT description to indicate cleaned SFTs."""
+    last_ch = desc[-1]
+    if last_ch == last_ch.upper():
+        desc += "gwLINECLEAN"
+    else:
+        desc += "GWLINECLEAN"
+    return desc
+
+
 def cli(*argv):
     """Command-line parser entry point."""
 
@@ -609,9 +619,9 @@ def cli(*argv):
 
             # Write cleaned SFT to file for output
             if SFT_fn_spec.pubObsRun > 0:
-                SFT_fn_spec.pubChannel += "wGWLINECLEAN"
+                SFT_fn_spec.pubChannel = add_SFT_desc_suffix(SFT_fn_spec.pubChannel)
             else:
-                SFT_fn_spec.privMisc += "wGWLINECLEAN"
+                SFT_fn_spec.privMisc = add_SFT_desc_suffix(SFT_fn_spec.privMisc)
             SFT_fn_spec.path = str(args.output_SFT_dir)
             cleaned_SFT_filename = lalp.BuildSFTFilenameFromSpec(SFT_fn_spec)
             lalp.WriteSFTVector2NamedFile(
