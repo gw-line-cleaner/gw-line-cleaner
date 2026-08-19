@@ -22,6 +22,8 @@ from coloredlogs import ColoredFormatter as _Formatter
 
 from . import __version__, apply_cleaning
 
+__all__ = ["cli"]
+
 # Configure logging
 logger = logging.getLogger()
 if not logger.hasHandlers():
