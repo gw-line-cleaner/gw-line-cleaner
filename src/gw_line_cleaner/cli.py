@@ -281,7 +281,7 @@ def compute_F_statistic(msg, SFT_filenames, Fstat_params, edat):
     for X in range(Fstat_res.numDetectors):
         detector_name = "".join(chr(c) for c in Fstat_res.detectorNames[X] if c > 0)
         Fstat_params_dict["twoF_" + detector_name] = float(Fstat_res.twoFPerDet(X)[0])
-    logger.debug("Computed F-statistic parameters: %s", Fstat_params_dict)
+    logger.info("Computed F-statistic parameters: %s", Fstat_params_dict)
 
     return Fstat_params_dict
 
@@ -392,7 +392,7 @@ def cli(*argv):
                 out_stats["inject_params"]["aPlus"] *= sqrt_Sh
                 out_stats["inject_params"]["aCross"] *= sqrt_Sh
 
-            logger.debug("Injection parameters: %s", out_stats["inject_params"])
+            logger.info("Injection parameters: %s", out_stats["inject_params"])
 
             # Make directory for injection SFTs
             inj_SFT_dir = Path(temp_dir) / "injected_SFTs"
