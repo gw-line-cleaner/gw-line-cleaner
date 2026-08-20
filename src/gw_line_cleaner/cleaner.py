@@ -394,7 +394,7 @@ def get_cleaning_mask(
 def apply_cleaning(
     freq: np.ndarray, detector_psds: Dict[str, np.ndarray], min_detectors: int = 2
 ) -> Tuple[Dict[str, np.ndarray], Dict[str, np.ndarray]]:
-    """Apply line cleaning and return cleaned PSD arrays.
+    """Apply line cleaning and return cleaned PSD arrays and masks.
 
     Args:
         freq (np.ndarray): Frequency array (Hz)

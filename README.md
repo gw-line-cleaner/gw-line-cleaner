@@ -93,7 +93,7 @@ detector_psds = {
 }
 
 # Get cleaned PSDs (incoherent lines removed, coherent lines preserved)
-cleaned_psds = gwlc.apply_cleaning(freq, detector_psds, min_detectors=2)
+cleaned_psds, masks = gwlc.apply_cleaning(freq, detector_psds, min_detectors=2)
 
 # Or get just the cleaning masks
 masks = gwlc.get_cleaning_mask(freq, detector_psds, min_detectors=2)
