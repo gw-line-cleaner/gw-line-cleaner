@@ -8,7 +8,6 @@ Generalized to support arbitrary number of detectors.
 """
 
 import logging
-import tempfile
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Set, Tuple
 
@@ -113,24 +112,16 @@ def clean_lines_from_PSD(
             detector_clean[det_name][:] = 0.0
 
         # Convert PSD to ASD for analysis modules (ASD = sqrt(PSD))
-        detector_asds = {det: np.sqrt(psd) for det, psd in detector_psds.items()}
+        detector_asds = {
+            det: np.column_stack((freq, np.sqrt(psd)))
+            for det, psd in detector_psds.items()
+        }
 
-        logger.info("Converting PSD to ASD and starting coherent analysis")
-
-        with tempfile.TemporaryDirectory(dir=Path.cwd()) as temp_dir:
-            # Save each detector's ASD data to temporary files
-            temp_files = {}
-            for det_name in detector_names:
-                temp_file = Path(temp_dir) / f"{det_name}_temp.csv"
-                _write_csv(temp_file, [], zip(freq, detector_asds[det_name]))
-                temp_files[det_name] = str(temp_file)
-
-            logger.info("Running coherent analysis using coherent_analyzer module")
-
-            # Use generalized coherent_analyzer
-            coherent_groups, detector_data = coherent_analyzer.analyze_coherent_lines(
-                temp_files, min_detectors=min_detectors
-            )
+        # Use generalized coherent_analyzer
+        logger.info("Running coherent analysis using coherent_analyzer module")
+        coherent_groups, detector_data = coherent_analyzer.analyze_coherent_lines(
+            detector_asds, min_detectors=min_detectors
+        )
 
         # Extract per-detector data
         detector_lines: Dict[str, list] = {}

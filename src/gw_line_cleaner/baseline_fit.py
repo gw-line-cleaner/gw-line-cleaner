@@ -9,7 +9,7 @@ import os
 import time
 import warnings
 from dataclasses import dataclass
-from typing import Dict, List, Optional, Tuple
+from typing import Dict, List, Optional, Tuple, Union
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -730,11 +730,15 @@ def _fit_polynomial(
 # =============================================================================
 
 
-def load_and_fit(file_path: str) -> FitTuple:
-    """Convenience function to load data from file and fit baseline in one step.
+def load_and_fit(detector_asd_src: Union[str, np.ndarray]) -> FitTuple:
+    """Convenience function to load data and fit baseline in one step.
 
     Args:
-        file_path (str): Path to spectrum data file
+        detector_asd_src (Union[str, np.ndarray]):
+            Either
+            - a file supported by load() containing the spectrum data, or
+            - a NumPy array of the spectrum.
+            In either case, columns are (frequency, asd_spectrum).
 
     Returns:
         FitTuple: Tuple of (frequency, asd_spectrum, result)
@@ -742,31 +746,42 @@ def load_and_fit(file_path: str) -> FitTuple:
     Raises:
         ValueError: If loading or fitting fails
     """
+    if isinstance(detector_asd_src, np.ndarray):
+        detector_asd_src_str = np.array2string(detector_asd_src, threshold=5)
+    else:
+        detector_asd_src_str = detector_asd_src
     try:
-        frequency, asd_spectrum = load(file_path)
+        if isinstance(detector_asd_src, np.ndarray):
+            frequency = detector_asd_src[:, 0]
+            asd_spectrum = detector_asd_src[:, 1]
+        else:
+            frequency, asd_spectrum = load(detector_asd_src)
         result = fit(frequency, asd_spectrum)
         return frequency, asd_spectrum, result
     except Exception as e:
-        msg = f"Failed to load and fit {file_path}: {str(e)}"
+        msg = f"Failed to load and fit {detector_asd_src_str}: {str(e)}"
         raise ValueError(msg)
 
 
 def load_and_fit_multiple(
-    file_dict: Dict[str, str],
+    detector_asd_srcs: Dict[str, Union[str, np.ndarray]],
 ) -> Dict[str, FitTuple]:
     """Convenience function to load and fit multiple detector files.
 
     Args:
-        file_dict (Dict[str, str]): Dictionary mapping detector names to file paths
-                   e.g., {"H1": "/path/to/h1.txt", "L1": "/path/to/l1.txt"}
+        detector_asd_srcs (Dict[str, Union[str, np.ndarray]]):
+            Dictionary mapping detector names to file paths containing ASDs:
+                e.g., {"H1": "/path/to/h1.txt", "L1": "/path/to/l1.txt", "V1": "/path/to/v1.txt"}
+            or mapping detector names to NumPy arrays containing ASDs:
+                e.g., {"H1": np.array(...), "L1": np.array(...), "V1": np.array(...)}
 
     Returns:
         Dict[str, FitTuple]:
             Dictionary mapping detector names to (frequency, asd_spectrum, result) tuples
     """
     results = {}
-    for det_name, file_path in file_dict.items():
-        frequency, asd_spectrum, result = load_and_fit(file_path)
+    for det_name, detector_asd_src in detector_asd_srcs.items():
+        frequency, asd_spectrum, result = load_and_fit(detector_asd_src)
         results[det_name] = (frequency, asd_spectrum, result)
     return results
 

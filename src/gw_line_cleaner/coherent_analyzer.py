@@ -10,7 +10,7 @@ Generalized to support arbitrary number of detectors.
 import itertools
 import logging
 from dataclasses import dataclass, field
-from typing import Dict, List, Optional, Set, Tuple
+from typing import Dict, List, Optional, Set, Tuple, Union
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -115,14 +115,16 @@ class CoherentLine:
 
 
 def analyze_coherent_lines(
-    detector_files: Dict[str, str], min_detectors: int = 2
+    detector_asd_srcs: Dict[str, Union[str, np.ndarray]], min_detectors: int = 2
 ) -> Tuple[List[CoherentLineGroup], Dict[str, DetectorData]]:
     """Analyze coherent spectral lines across multiple detectors.
 
     Args:
-        detector_files (Dict[str, str]):
-            Dictionary mapping detector names to file paths
+        detector_asd_srcs (Dict[str, Union[str, np.ndarray]]):
+            Dictionary mapping detector names to file paths containing ASDs:
                 e.g., {"H1": "/path/to/h1.txt", "L1": "/path/to/l1.txt", "V1": "/path/to/v1.txt"}
+            or mapping detector names to NumPy arrays containing ASDs:
+                e.g., {"H1": np.array(...), "L1": np.array(...), "V1": np.array(...)}
         min_detectors (int): Minimum number of detectors a line must appear in to be considered coherent
 
     Returns:
@@ -130,16 +132,16 @@ def analyze_coherent_lines(
         - List of CoherentLineGroup objects (lines found in >= min_detectors)
         - Dictionary mapping detector names to DetectorData objects
     """
-    if len(detector_files) < 2:
+    if len(detector_asd_srcs) < 2:
         msg = "At least 2 detectors required for coherence analysis"
         raise ValueError(msg)
 
     # Process each detector
     detector_data: Dict[str, DetectorData] = {}
 
-    for det_name, file_path in detector_files.items():
-        logger.info("Fitting baseline PSD of detector %s", det_name)
-        freq, spectrum, result = baseline_fit.load_and_fit(file_path)
+    for det_name, detector_asd_src in detector_asd_srcs.items():
+        logger.info("Fitting baseline ASD of detector %s", det_name)
+        freq, spectrum, result = baseline_fit.load_and_fit(detector_asd_src)
         assert result is not None
         logger.info("Detecting lines in %s spectrum", det_name)
         lines = simple_line_detector.detect_lines(

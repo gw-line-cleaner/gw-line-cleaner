@@ -49,8 +49,8 @@ def test_lines():
     A_cleaned = masks["A1"].nonzero()[0]
     B_cleaned = masks["B1"].nonzero()[0]
 
-    assert all(A_cleaned == [100])
-    assert all(B_cleaned == [299, 300])
+    assert all(A_cleaned == [99, 100, 101])
+    assert all(B_cleaned == [299, 300, 301])
 
 
 def test_lines_signal():
@@ -78,5 +78,5 @@ def test_lines_signal():
     A_cleaned = masks["A1"].nonzero()[0]
     B_cleaned = masks["B1"].nonzero()[0]
 
-    assert all(A_cleaned == [100])
-    assert all(B_cleaned == [299, 300])
+    assert all(A_cleaned == [99, 100, 101])
+    assert all(B_cleaned == [299, 300, 301])

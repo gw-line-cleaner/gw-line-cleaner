@@ -105,8 +105,8 @@ masks = gwlc.get_cleaning_mask(freq, detector_psds, min_detectors=2)
 
 - `load(file_path)` - Load spectrum data from file
 - `fit(frequency, spectrum)` - Fit baseline to spectrum
-- `load_and_fit(file_path)` - Load and fit in one step
-- `load_and_fit_multiple(file_dict)` - Process multiple detectors
+- `load_and_fit(detector_asd_src)` - Load and fit in one step
+- `load_and_fit_multiple(detector_asd_srcs)` - Process multiple detectors
 
 #### Line Detection
 
@@ -116,7 +116,7 @@ masks = gwlc.get_cleaning_mask(freq, detector_psds, min_detectors=2)
 
 #### Coherent Analysis
 
-- `analyze_coherent_lines(detector_files)` - Full coherent analysis
+- `analyze_coherent_lines(detector_asd_srcs)` - Full coherent analysis
 - `analyze_coherent_lines_from_data(detector_data)` - Analysis from pre-loaded data
 - `plot_results(coherent_groups, detector_data)` - Visualize results
 - `print_summary(coherent_groups, detector_data)` - Print analysis summary
