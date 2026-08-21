@@ -21,7 +21,7 @@ detectors (LIGO H1/L1, Virgo, KAGRA, etc.).
 
 ## Installation
 
-Install from PyPI (when available):
+Install from PyPI:
 
 ```bash
 pip install gw-line-cleaner
