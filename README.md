@@ -30,7 +30,7 @@ pip install gw-line-cleaner
 Or install from source:
 
 ```bash
-git clone https://github.com/gw-line-cleaner/gw-line-cleaner.git
+git clone https://github.com/gwda/gw-line-cleaner.git
 cd gw-line-cleaner
 pip install -e .
 ```

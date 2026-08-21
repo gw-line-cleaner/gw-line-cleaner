@@ -39,8 +39,8 @@ license-files = [
 ]
 
 [project.urls]
-Homepage = "https://github.com/gw-line-cleaner/gw-line-cleaner"
-Issues = "https://github.com/gw-line-cleaner/gw-line-cleaner/issues"
+Homepage = "https://github.com/gwda/gw-line-cleaner"
+Issues = "https://github.com/gwda/gw-line-cleaner/issues"
 
 [project.scripts]
 gw-line-cleaner = "gw_line_cleaner.cli:cli"
